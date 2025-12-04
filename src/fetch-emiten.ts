@@ -135,17 +135,6 @@ async function getExistingLQ45Codes(): Promise<Set<string>> {
 }
 
 /**
- * Escape CSV field if it contains special characters
- */
-function escapeCsvField(field: string | number): string {
-  const str = String(field);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
-}
-
-/**
  * Convert emiten data to CSV format
  */
 function toCsv(emiten: EmitenData[]): string {

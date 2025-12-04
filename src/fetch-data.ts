@@ -76,6 +76,17 @@ const CSV_COLUMNS = [
 ];
 
 /**
+ * Escape CSV field if it contains special characters
+ */
+function escapeCsvField(field: string | number): string {
+  const str = String(field);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+/**
  * Parse a CSV line properly handling quoted fields
  */
 function parseCsvLine(line: string): string[] {
@@ -228,31 +239,31 @@ async function fetchStockData(code: string, length: number): Promise<StockData[]
  */
 function stockDataToCsvRow(data: StockData): string {
   return [
-    data.Date,
-    data.Previous,
-    data.OpenPrice,
-    data.FirstTrade,
-    data.High,
-    data.Low,
-    data.Close,
-    data.Change,
-    data.Volume,
-    data.Value,
-    data.Frequency,
-    data.IndexIndividual,
-    data.Offer,
-    data.OfferVolume,
-    data.Bid,
-    data.BidVolume,
-    data.ListedShares,
-    data.TradebleShares,
-    data.WeightForIndex,
-    data.ForeignSell,
-    data.ForeignBuy,
-    data.DelistingDate,
-    data.NonRegularVolume,
-    data.NonRegularValue,
-    data.NonRegularFrequency
+    escapeCsvField(data.Date),
+    escapeCsvField(data.Previous),
+    escapeCsvField(data.OpenPrice),
+    escapeCsvField(data.FirstTrade),
+    escapeCsvField(data.High),
+    escapeCsvField(data.Low),
+    escapeCsvField(data.Close),
+    escapeCsvField(data.Change),
+    escapeCsvField(data.Volume),
+    escapeCsvField(data.Value),
+    escapeCsvField(data.Frequency),
+    escapeCsvField(data.IndexIndividual),
+    escapeCsvField(data.Offer),
+    escapeCsvField(data.OfferVolume),
+    escapeCsvField(data.Bid),
+    escapeCsvField(data.BidVolume),
+    escapeCsvField(data.ListedShares),
+    escapeCsvField(data.TradebleShares),
+    escapeCsvField(data.WeightForIndex),
+    escapeCsvField(data.ForeignSell),
+    escapeCsvField(data.ForeignBuy),
+    escapeCsvField(data.DelistingDate),
+    escapeCsvField(data.NonRegularVolume),
+    escapeCsvField(data.NonRegularValue),
+    escapeCsvField(data.NonRegularFrequency)
   ].join(',');
 }
 
