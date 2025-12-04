@@ -64,6 +64,50 @@ async function fetchEmitenList(): Promise<EmitenData[]> {
 }
 
 /**
+ * Escape CSV field if it contains special characters
+ */
+function escapeCsvField(field: string | number): string {
+  const str = String(field);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+/**
+ * Parse a CSV line properly handling quoted fields
+ */
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        // Escaped quote
+        current += '"';
+        i++;
+      } else {
+        // Toggle quote mode
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      // End of field
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current);
+  return result;
+}
+
+/**
  * Read existing LQ45 codes from CSV (if exists)
  */
 async function getExistingLQ45Codes(): Promise<Set<string>> {
@@ -74,7 +118,9 @@ async function getExistingLQ45Codes(): Promise<Set<string>> {
     const codes = new Set<string>();
     
     for (const line of lines) {
-      const code = line.split(',')[0].trim();
+      if (!line.trim()) continue;
+      const parts = parseCsvLine(line);
+      const code = parts[0].trim();
       if (code) {
         codes.add(code);
       }
@@ -89,12 +135,23 @@ async function getExistingLQ45Codes(): Promise<Set<string>> {
 }
 
 /**
+ * Escape CSV field if it contains special characters
+ */
+function escapeCsvField(field: string | number): string {
+  const str = String(field);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+/**
  * Convert emiten data to CSV format
  */
 function toCsv(emiten: EmitenData[]): string {
   const header = 'code,name,listingDate,shares,listingBoard\n';
   const rows = emiten.map(e => 
-    `${e.Code},${e.Name},${e.ListingDate},${e.Shares},${e.ListingBoard}`
+    `${escapeCsvField(e.Code)},${escapeCsvField(e.Name)},${escapeCsvField(e.ListingDate)},${escapeCsvField(e.Shares)},${escapeCsvField(e.ListingBoard)}`
   ).join('\n');
   
   return header + rows;

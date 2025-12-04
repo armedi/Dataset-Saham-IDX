@@ -76,6 +76,39 @@ const CSV_COLUMNS = [
 ];
 
 /**
+ * Parse a CSV line properly handling quoted fields
+ */
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        // Escaped quote
+        current += '"';
+        i++;
+      } else {
+        // Toggle quote mode
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      // End of field
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current);
+  return result;
+}
+
+/**
  * Read emiten list from CSV
  */
 async function readEmitenList(): Promise<EmitenInfo[]> {
@@ -87,7 +120,7 @@ async function readEmitenList(): Promise<EmitenInfo[]> {
   for (const line of lines) {
     if (!line.trim()) continue;
     
-    const parts = line.split(',');
+    const parts = parseCsvLine(line);
     if (parts.length >= 5) {
       emiten.push({
         code: parts[0].trim(),
@@ -114,7 +147,8 @@ async function getLastDate(code: string): Promise<string | null> {
     if (lines.length <= 1) return null; // Only header or empty
     
     const lastLine = lines[lines.length - 1];
-    const date = lastLine.split(',')[0];
+    const parts = parseCsvLine(lastLine);
+    const date = parts[0];
     return date;
   } catch {
     return null;
@@ -145,7 +179,8 @@ async function getExistingData(code: string): Promise<Set<string>> {
     
     for (const line of lines) {
       if (!line.trim()) continue;
-      const date = line.split(',')[0];
+      const parts = parseCsvLine(line);
+      const date = parts[0];
       existingDates.add(date);
     }
   } catch {
@@ -233,7 +268,8 @@ async function getLQ45Codes(): Promise<Set<string>> {
     
     for (const line of lines) {
       if (!line.trim()) continue;
-      const code = line.split(',')[0].trim();
+      const parts = parseCsvLine(line);
+      const code = parts[0].trim();
       if (code) codes.add(code);
     }
     
