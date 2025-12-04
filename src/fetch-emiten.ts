@@ -151,6 +151,11 @@ function toCsv(emiten: EmitenData[]): string {
  */
 async function main() {
   try {
+    // Ensure directory exists
+    console.log('Ensuring List Emiten directory exists...');
+    await Bun.write('List Emiten/.gitkeep', '');
+    console.log('✓ Directory ready\n');
+    
     // Fetch all emiten
     const allEmiten = await fetchEmitenList();
     

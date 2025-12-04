@@ -379,6 +379,12 @@ async function main() {
     console.log('IDX Stock Data Updater');
     console.log('='.repeat(60));
     
+    // Ensure directories exist
+    console.log('\nEnsuring directories exist...');
+    await Bun.write('Saham/Semua/.gitkeep', '');
+    await Bun.write('Saham/LQ45/.gitkeep', '');
+    console.log('✓ Directories ready');
+    
     // Read emiten list
     console.log('\nReading emiten list...');
     const emitenList = await readEmitenList();
