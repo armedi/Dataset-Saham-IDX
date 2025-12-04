@@ -1,0 +1,11 @@
+{
+  "name": "dataset-saham-idx-scraper",
+  "version": "1.0.0",
+  "description": "TypeScript script to fetch and update IDX stock data",
+  "type": "module",
+  "scripts": {
+    "fetch-emiten": "bun run src/fetch-emiten.ts",
+    "fetch-data": "bun run src/fetch-data.ts",
+    "update-all": "bun run src/fetch-emiten.ts && bun run src/fetch-data.ts"
+  }
+}

@@ -1,2 +1,8 @@
 daily.sh
 dataset-metadata.json
+.DS_Store
+Saham/.DS_Store
+node_modules/
+dist/
+*.log
+bun.lockb
